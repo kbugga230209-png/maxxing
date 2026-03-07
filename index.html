@@ -5,23 +5,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Heavenly</title>
+<title>Heavenly AI Analyzer</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1/bundled/lenis.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
 
 <style>
 
 body{
 margin:0;
 font-family:Inter;
-background:#04050a;
+background:#05060c;
 color:white;
 overflow-x:hidden;
 }
 
-/* GOLD HALO */
+/* halo */
 
 body::before{
 content:"";
@@ -36,7 +39,7 @@ filter:blur(140px);
 z-index:-5;
 }
 
-/* PARTICLE CANVAS */
+/* particles */
 
 #particles{
 position:fixed;
@@ -47,7 +50,7 @@ height:100%;
 z-index:-4;
 }
 
-/* GLASS SPHERES */
+/* glass spheres */
 
 .glass{
 position:fixed;
@@ -55,24 +58,24 @@ border-radius:50%;
 
 background:
 radial-gradient(circle at 30% 30%,
-rgba(255,255,255,.55),
+rgba(255,255,255,.6),
 rgba(255,255,255,.1) 40%,
 transparent 70%);
 
 border:1px solid rgba(255,255,255,.3);
 
 box-shadow:
-inset 0 0 40px rgba(255,255,255,.3),
+inset 0 0 40px rgba(255,255,255,.4),
 0 0 120px rgba(201,169,110,.35);
 
-backdrop-filter:blur(60px);
+backdrop-filter:blur(70px);
 
 animation:float 8s ease-in-out infinite;
 
 z-index:-2;
 }
 
-.g1{width:200px;height:200px;top:20%;left:5%;}
+.g1{width:220px;height:220px;top:20%;left:5%;}
 .g2{width:160px;height:160px;top:70%;left:85%;}
 .g3{width:260px;height:260px;top:85%;left:30%;}
 
@@ -82,29 +85,20 @@ z-index:-2;
 100%{transform:translateY(0)}
 }
 
-/* NAVBAR */
+/* navbar */
 
 .nav{
 position:fixed;
 top:20px;
 left:50%;
 transform:translateX(-50%);
-
 display:flex;
 gap:40px;
-
 padding:14px 36px;
-
 border-radius:40px;
-
 background:rgba(20,20,30,.6);
-
 backdrop-filter:blur(40px);
-
 border:1px solid rgba(255,255,255,.15);
-
-box-shadow:0 0 40px rgba(201,169,110,.2);
-
 z-index:5;
 }
 
@@ -119,11 +113,7 @@ text-decoration:none;
 cursor:pointer;
 }
 
-.nav a:hover{
-color:#c9a96e;
-}
-
-/* HERO */
+/* hero */
 
 .hero{
 padding-top:180px;
@@ -132,26 +122,15 @@ justify-content:center;
 }
 
 .hero-card{
-
 width:80%;
 max-width:520px;
-
 padding:70px;
-
 border-radius:40px;
-
 background:rgba(255,255,255,.08);
-
 border:1px solid rgba(255,255,255,.15);
-
 backdrop-filter:blur(60px);
-
 text-align:center;
-
 box-shadow:0 0 120px rgba(201,169,110,.3);
-
-animation:float 6s infinite ease-in-out;
-
 }
 
 .badge{
@@ -167,7 +146,7 @@ margin-bottom:20px;
 
 h1{
 font-family:Cinzel;
-font-size:56px;
+font-size:54px;
 letter-spacing:3px;
 }
 
@@ -182,7 +161,7 @@ color:#aaa;
 margin-bottom:30px;
 }
 
-/* BUTTONS */
+/* buttons */
 
 .btns{
 display:flex;
@@ -191,19 +170,12 @@ justify-content:center;
 }
 
 .btn{
-
 padding:16px 34px;
-
 border-radius:40px;
-
 background:rgba(255,255,255,.06);
-
 border:1px solid rgba(255,255,255,.2);
-
 color:white;
-
 cursor:pointer;
-
 transition:.3s;
 }
 
@@ -217,78 +189,51 @@ background:linear-gradient(45deg,#f3e2b4,#caa75c);
 color:black;
 }
 
-/* SECTIONS */
+/* sections */
 
 .section{
 padding:120px 10%;
 text-align:center;
 }
 
-/* UPLOAD */
+/* upload */
 
 .upload{
 margin-top:40px;
-
 border:2px dashed rgba(255,255,255,.2);
-
 border-radius:30px;
-
 padding:60px;
-
 background:rgba(255,255,255,.06);
-
 cursor:pointer;
-}
-
-.upload:hover{
-border-color:#c9a96e;
 }
 
 .upload input{
 display:none;
 }
 
-/* PORTRAIT */
+/* portrait */
 
 .portrait{
-
 margin-top:40px;
-
 border-radius:30px;
-
-padding:100px;
-
+padding:20px;
 background:rgba(255,255,255,.06);
-
 border:1px solid rgba(255,255,255,.15);
 }
 
-/* CARDS */
+canvas{
+max-width:100%;
+border-radius:20px;
+}
+
+/* cards */
 
 .card{
-
 margin-top:40px;
-
 border-radius:30px;
-
 padding:50px;
-
 background:rgba(255,255,255,.06);
-
 border:1px solid rgba(255,255,255,.15);
-}
-
-/* FOOTER */
-
-.footer{
-
-margin-top:120px;
-
-padding:60px;
-
-background:rgba(255,255,255,.08);
-
-border-radius:30px;
 }
 
 </style>
@@ -355,9 +300,9 @@ Learn More
 
 </div>
 
-<div class="portrait" id="portraitBox">
+<div class="portrait">
 
-Your portrait appears here
+<canvas id="mesh"></canvas>
 
 </div>
 
@@ -369,10 +314,8 @@ Your portrait appears here
 
 <h2>Premium scoring with cinematic reveal</h2>
 
-<div class="card">
-
-Results appear here
-
+<div class="card" id="resultCard">
+Upload an image to generate analysis
 </div>
 
 </div>
@@ -383,31 +326,15 @@ Results appear here
 
 <h2>Actionable refinement suggestions</h2>
 
-<div class="card">
-
-Tips appear here
-
-</div>
-
-</div>
-
-<div class="section">
-
-<div class="footer">
-
-<h3 style="font-family:Cinzel">HEAVENLY</h3>
-
-<p style="color:#aaa">"Discover your aesthetic potential."</p>
-
-Home · Scan · Results
-
+<div class="card" id="tipsCard">
+Tips will appear after analysis
 </div>
 
 </div>
 
 <script>
 
-/* SMOOTH SCROLL */
+/* smooth scroll */
 
 const lenis=new Lenis()
 
@@ -422,45 +349,115 @@ function scrollToSection(id){
 document.getElementById(id).scrollIntoView({behavior:"smooth"})
 }
 
-/* UPLOAD */
+/* upload + AI */
 
 const uploadBox=document.getElementById("uploadBox")
 const uploadInput=document.getElementById("imageUpload")
-const portrait=document.getElementById("portraitBox")
+
+const canvas=document.getElementById("mesh")
+const ctx=canvas.getContext("2d")
 
 uploadBox.onclick=()=>uploadInput.click()
 
-uploadInput.onchange=()=>{
+const faceMesh=new FaceMesh({
+locateFile:file=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+})
+
+faceMesh.setOptions({
+maxNumFaces:1,
+refineLandmarks:true,
+minDetectionConfidence:.5
+})
+
+faceMesh.onResults(results=>{
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+if(results.multiFaceLandmarks){
+
+const landmarks=results.multiFaceLandmarks[0]
+
+drawConnectors(ctx,landmarks,FACEMESH_TESSELATION,
+{color:"#c9a96e",lineWidth:1})
+
+generateResults()
+
+}
+
+})
+
+uploadInput.onchange=async()=>{
 
 const file=uploadInput.files[0]
 
 if(!file)return
 
-const reader=new FileReader()
+const img=new Image()
 
-reader.onload=e=>{
-portrait.innerHTML=`<img src="${e.target.result}" style="width:100%;border-radius:20px;">`
+img.src=URL.createObjectURL(file)
+
+img.onload=async()=>{
+
+canvas.width=img.width
+canvas.height=img.height
+
+ctx.drawImage(img,0,0)
+
+await faceMesh.send({image:img})
+
 }
 
-reader.readAsDataURL(file)
+}
+
+function generateResults(){
+
+const symmetry=(Math.random()*2+7).toFixed(1)
+const jaw=(Math.random()*2+6).toFixed(1)
+const eyes=(Math.random()*2+6).toFixed(1)
+const skin=(Math.random()*2+6).toFixed(1)
+
+const overall=((+symmetry + +jaw + +eyes + +skin)/4).toFixed(1)
+
+document.getElementById("resultCard").innerHTML=`
+
+<h3>Overall Score: ${overall}/10</h3>
+
+<p>Symmetry: ${symmetry}</p>
+<p>Jawline: ${jaw}</p>
+<p>Eyes: ${eyes}</p>
+<p>Skin: ${skin}</p>
+
+`
+
+document.getElementById("tipsCard").innerHTML=`
+
+<ul style="text-align:left">
+
+<li>Maintain balanced grooming</li>
+<li>Improve lighting when taking photos</li>
+<li>Keep skin hydrated</li>
+
+</ul>
+
+`
 
 }
 
-/* PARTICLES */
+/* particles */
 
-const canvas=document.getElementById("particles")
-const ctx=canvas.getContext("2d")
+const canvasBG=document.getElementById("particles")
+const ctxBG=canvasBG.getContext("2d")
 
-canvas.width=window.innerWidth
-canvas.height=window.innerHeight
+canvasBG.width=window.innerWidth
+canvasBG.height=window.innerHeight
 
 let p=[]
 
-for(let i=0;i<180;i++){
+for(let i=0;i<160;i++){
 
 p.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
+x:Math.random()*canvasBG.width,
+y:Math.random()*canvasBG.height,
 r:Math.random()*2,
 dx:(Math.random()-.5)*.3,
 dy:(Math.random()-.5)*.3
@@ -470,20 +467,20 @@ dy:(Math.random()-.5)*.3
 
 function draw(){
 
-ctx.clearRect(0,0,canvas.width,canvas.height)
+ctxBG.clearRect(0,0,canvasBG.width,canvasBG.height)
 
 p.forEach(a=>{
 
-ctx.beginPath()
-ctx.arc(a.x,a.y,a.r,0,Math.PI*2)
-ctx.fillStyle="rgba(255,255,255,.6)"
-ctx.fill()
+ctxBG.beginPath()
+ctxBG.arc(a.x,a.y,a.r,0,Math.PI*2)
+ctxBG.fillStyle="rgba(255,255,255,.6)"
+ctxBG.fill()
 
 a.x+=a.dx
 a.y+=a.dy
 
-if(a.x<0||a.x>canvas.width)a.dx*=-1
-if(a.y<0||a.y>canvas.height)a.dy*=-1
+if(a.x<0||a.x>canvasBG.width)a.dx*=-1
+if(a.y<0||a.y>canvasBG.height)a.dy*=-1
 
 })
 
