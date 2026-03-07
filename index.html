@@ -1,1739 +1,387 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HEAVENLY — AI Aesthetic Analyzer</title>
-  <style>
-    /* style.css */
-    :root{
-      --bg:#0A0A0F;
-      --text:#FFFFFF;
-      --muted:rgba(255,255,255,0.68);
-      --soft:rgba(255,255,255,0.5);
-      --gold:#C9A96E;
-      --gold-soft:rgba(201,169,110,0.18);
-      --glass:rgba(255,255,255,0.08);
-      --border:rgba(255,255,255,0.14);
-      --shadow:0 25px 70px rgba(0,0,0,0.45);
-      --display: Georgia, "Times New Roman", serif;
-      --body: Inter, Poppins, "Segoe UI", system-ui, sans-serif;
-      --radius-xl: 28px;
-      --radius-lg: 24px;
-    }
-
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      min-height:100svh;
-      background:
-        radial-gradient(circle at 20% 0%, rgba(255,255,255,0.04), transparent 30%),
-        radial-gradient(circle at 85% 85%, rgba(201,169,110,0.06), transparent 30%),
-        linear-gradient(180deg, #09090d 0%, #0A0A0F 45%, #0b0b12 100%);
-      color:var(--text);
-      font-family:var(--body);
-      overflow-x:hidden;
-    }
-
-    a{color:inherit;text-decoration:none}
-    img{max-width:100%;display:block}
-    button,input{font:inherit}
-
-    #bgCanvas{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100%;
-      z-index:-3;
-      pointer-events:none;
-    }
-
-    .bg-aura{
-      position:fixed;
-      border-radius:50%;
-      filter:blur(80px);
-      pointer-events:none;
-      z-index:-2;
-      opacity:0.2;
-    }
-    .aura-1{
-      width:42vw;
-      aspect-ratio:1;
-      left:-12vw;
-      top:-10vw;
-      background:radial-gradient(circle, rgba(255,255,255,0.25), transparent 68%);
-    }
-    .aura-2{
-      width:40vw;
-      aspect-ratio:1;
-      right:-10vw;
-      bottom:-12vw;
-      background:radial-gradient(circle, rgba(201,169,110,0.28), transparent 68%);
-    }
-
-    .site-shell{
-      position:relative;
-      z-index:1;
-    }
-
-    .glass{
-      background:linear-gradient(180deg, rgba(255,255,255,0.095), rgba(255,255,255,0.045));
-      border:1px solid var(--border);
-      backdrop-filter:blur(18px) saturate(140%);
-      -webkit-backdrop-filter:blur(18px) saturate(140%);
-      box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-
-    .topbar{
-      position:fixed;
-      top:18px;
-      left:50%;
-      transform:translateX(-50%);
-      width:min(1120px, calc(100% - 24px));
-      padding:14px 18px;
-      border-radius:20px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:18px;
-      z-index:50;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      letter-spacing:0.22em;
-      font-weight:700;
-      font-size:0.9rem;
-      text-transform:uppercase;
-      white-space:nowrap;
-    }
-
-    .brand-mark{
-      width:34px;
-      height:34px;
-      border-radius:50%;
-      background:
-        radial-gradient(circle at 35% 35%, #fff, rgba(255,255,255,0.18) 35%, rgba(201,169,110,0.22) 60%, transparent 72%);
-      box-shadow:
-        0 0 20px rgba(255,255,255,0.16),
-        0 0 36px rgba(201,169,110,0.12),
-        inset 0 0 20px rgba(255,255,255,0.18);
-      flex:0 0 auto;
-    }
-
-    .nav-links{
-      display:flex;
-      align-items:center;
-      flex-wrap:wrap;
-      gap:8px;
-      color:var(--muted);
-    }
-
-    .nav-links a{
-      padding:10px 14px;
-      border-radius:999px;
-      transition:transform .3s ease, color .3s ease, background .3s ease, box-shadow .3s ease;
-    }
-
-    .nav-links a:hover{
-      color:var(--text);
-      background:rgba(255,255,255,0.06);
-      box-shadow:0 0 0 1px rgba(255,255,255,0.05) inset;
-      transform:translateY(-1px);
-    }
-
-    .section{
-      position:relative;
-      padding: 60px 10%;
-      scroll-margin-top:110px;
-    }
-
-    .section-inner{
-      max-width:1160px;
-      margin:0 auto;
-      position:relative;
-    }
-
-    .hero{
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow:hidden;
-    }
-
-    .hero .section-inner{
-      width:100%;
-      display:grid;
-      place-items:center;
-    }
-
-    .hero-halo{
-      position:absolute;
-      left:50%;
-      top:48%;
-      transform:translate(-50%,-50%);
-      width:min(76vw, 880px);
-      aspect-ratio:1;
-      background:
-        radial-gradient(circle, rgba(255,255,255,0.18), rgba(201,169,110,0.1) 30%, rgba(255,255,255,0.03) 54%, transparent 72%);
-      filter:blur(26px);
-      pointer-events:none;
-      animation:breathe 8s ease-in-out infinite;
-    }
-
-    .hero-panel{
-      position:relative;
-      z-index:2;
-      width:min(760px, 100%);
-      padding:clamp(28px, 5vw, 54px);
-      border-radius:32px;
-      text-align:center;
-      overflow:hidden;
-    }
-
-    .hero-panel::before{
-      content:"";
-      position:absolute;
-      inset:auto -10% -40% auto;
-      width:260px;
-      height:260px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(201,169,110,0.16), transparent 70%);
-      pointer-events:none;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:0.58rem 0.95rem;
-      border-radius:999px;
-      background:rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.08);
-      color:rgba(255,255,255,0.84);
-      text-transform:uppercase;
-      letter-spacing:0.16em;
-      font-size:0.72rem;
-    }
-
-    h1,h2,h3,h4{
-      margin:0;
-      line-height:1.05;
-      font-family:var(--display);
-      letter-spacing:0.04em;
-    }
-
-    .hero h1{
-      margin-top:20px;
-      font-size:clamp(3.4rem, 11vw, 7rem);
-      text-shadow:0 0 40px rgba(255,255,255,0.14), 0 0 80px rgba(201,169,110,0.12);
-    }
-
-    .hero h2{
-      margin-top:14px;
-      font-size:clamp(1.05rem, 3vw, 1.5rem);
-      font-family:var(--body);
-      letter-spacing:0.24em;
-      text-transform:uppercase;
-      color:var(--gold);
-      font-weight:600;
-    }
-
-    .hero p{
-      max-width:560px;
-      margin:18px auto 0;
-      color:var(--muted);
-      font-size:clamp(1rem, 1.6vw, 1.16rem);
-      line-height:1.75;
-    }
-
-    .hero-actions{
-      display:flex;
-      justify-content:center;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-top:32px;
-    }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      min-height:52px;
-      padding:14px 22px;
-      border-radius:999px;
-      border:1px solid transparent;
-      cursor:pointer;
-      font-weight:600;
-      transition:transform .35s ease, box-shadow .35s ease, border-color .35s ease, background .35s ease;
-      white-space:nowrap;
-    }
-
-    .btn:hover{
-      transform:translateY(-2px);
-    }
-
-    .btn-primary{
-      color:#111;
-      background:linear-gradient(135deg, rgba(255,255,255,0.96), rgba(201,169,110,0.85));
-      box-shadow:0 16px 40px rgba(201,169,110,0.18), inset 0 1px 0 rgba(255,255,255,0.8);
-    }
-
-    .btn-primary:hover{
-      box-shadow:0 0 0 1px rgba(255,255,255,0.2), 0 22px 55px rgba(201,169,110,0.24);
-    }
-
-    .btn-secondary{
-      background:rgba(255,255,255,0.04);
-      color:var(--text);
-      border-color:rgba(255,255,255,0.14);
-    }
-
-    .btn-secondary:hover{
-      border-color:rgba(201,169,110,0.36);
-      box-shadow:0 22px 55px rgba(201,169,110,0.08);
-    }
-
-    .float-chip{
-      position:absolute;
-      z-index:1;
-      padding:14px 16px;
-      border-radius:18px;
-      color:var(--muted);
-      font-size:0.88rem;
-      animation:float 7s ease-in-out infinite;
-      white-space:nowrap;
-    }
-
-    .chip-1{top:18%;left:6%}
-    .chip-2{top:30%;right:7%;animation-delay:-1.7s}
-    .chip-3{bottom:16%;left:10%;animation-delay:-3.1s}
-
-    .section-heading{
-      max-width:760px;
-      margin:0 auto 32px;
-      text-align:center;
-    }
-
-    .section-heading h2{
-      margin-top:16px;
-      font-size:clamp(2rem, 5vw, 3.3rem);
-    }
-
-    .section-heading p{
-      margin:16px auto 0;
-      color:var(--muted);
-      line-height:1.75;
-      max-width:680px;
-    }
-
-    .scan-layout{
-      display:grid;
-      grid-template-columns:1fr 1.2fr;
-      gap:24px;
-      align-items:stretch;
-      margin-top:32px;
-    }
-
-    .upload-panel,
-    .preview-panel,
-    .score-panel,
-    .metric-card,
-    .tips-card,
-    .results-placeholder,
-    .tips-placeholder{
-      border-radius:var(--radius-xl);
-    }
-
-    .upload-panel{
-      padding:24px;
-      display:flex;
-      flex-direction:column;
-      gap:20px;
-    }
-
-    .upload-drop{
-      position:relative;
-      min-height:240px;
-      display:grid;
-      place-items:center;
-      padding:24px;
-      border-radius:24px;
-      border:1px dashed rgba(255,255,255,0.18);
-      background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-      cursor:pointer;
-      transition:transform .35s ease, border-color .35s ease, box-shadow .35s ease;
-      text-align:center;
-      overflow:hidden;
-    }
-
-    .upload-drop::before{
-      content:"";
-      position:absolute;
-      inset:auto auto -40% -20%;
-      width:180px;
-      height:180px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(201,169,110,0.15), transparent 70%);
-      pointer-events:none;
-    }
-
-    .upload-drop:hover{
-      transform:translateY(-4px);
-      border-color:rgba(201,169,110,0.44);
-      box-shadow:0 22px 50px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(201,169,110,0.12);
-    }
-
-    .upload-drop input{
-      position:absolute;
-      inset:0;
-      opacity:0;
-      cursor:pointer;
-    }
-
-    .upload-graphic{
-      font-size:2.65rem;
-      margin-bottom:12px;
-      filter:drop-shadow(0 0 18px rgba(201,169,110,0.24));
-    }
-
-    .upload-copy strong{
-      display:block;
-      font-size:1.08rem;
-      letter-spacing:0.06em;
-    }
-
-    .upload-copy span{
-      display:block;
-      margin-top:8px;
-      color:var(--muted);
-      font-size:0.95rem;
-      line-height:1.6;
-    }
-
-    .status-box{
-      padding:18px;
-      border-radius:22px;
-      background:rgba(0,0,0,0.18);
-      border:1px solid rgba(255,255,255,0.08);
-    }
-
-    .status-label{
-      font-size:0.75rem;
-      text-transform:uppercase;
-      letter-spacing:0.16em;
-      color:rgba(255,255,255,0.62);
-    }
-
-    .status-current{
-      min-height:1.6em;
-      margin-top:10px;
-      font-size:1.05rem;
-      color:var(--text);
-    }
-
-    .status-list{
-      list-style:none;
-      padding:0;
-      margin:18px 0 0;
-      display:grid;
-      gap:10px;
-    }
-
-    .status-item{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      color:rgba(255,255,255,0.5);
-      transition:transform .35s ease, color .35s ease;
-    }
-
-    .status-item::before{
-      content:"";
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:rgba(255,255,255,0.18);
-      box-shadow:0 0 0 5px rgba(255,255,255,0.04);
-      flex:0 0 auto;
-    }
-
-    .status-item.active{
-      color:var(--text);
-      transform:translateX(4px);
-    }
-
-    .status-item.active::before{
-      background:var(--gold);
-      box-shadow:0 0 0 6px rgba(201,169,110,0.12), 0 0 18px rgba(201,169,110,0.38);
-    }
-
-    .status-item.done{
-      color:rgba(255,255,255,0.8);
-    }
-
-    .status-item.done::before{
-      background:#fff;
-      box-shadow:0 0 0 5px rgba(255,255,255,0.06), 0 0 14px rgba(255,255,255,0.28);
-    }
-
-    .preview-panel{
-      padding:24px;
-      display:flex;
-      flex-direction:column;
-      gap:16px;
-      position:relative;
-    }
-
-    .scanner-frame{
-      position:relative;
-      aspect-ratio:4 / 5;
-      border-radius:30px;
-      overflow:hidden;
-      background:
-        radial-gradient(circle at 50% 25%, rgba(201,169,110,0.12), transparent 42%),
-        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
-      border:1px solid rgba(255,255,255,0.12);
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04), 0 30px 70px rgba(0,0,0,0.34);
-    }
-
-    .scanner-frame::before{
-      content:"";
-      position:absolute;
-      inset:16px;
-      border:1px solid rgba(201,169,110,0.3);
-      border-radius:24px;
-      pointer-events:none;
-      opacity:0.75;
-      z-index:4;
-    }
-
-    .scanner-frame::after{
-      content:"";
-      position:absolute;
-      inset:-20%;
-      background:radial-gradient(circle at center, rgba(255,255,255,0.14), transparent 52%);
-      opacity:0;
-      transition:opacity .45s ease;
-      pointer-events:none;
-      z-index:1;
-    }
-
-    .scanner-frame.ready::after,
-    .scanner-frame.scanning::after{
-      opacity:0.8;
-    }
-
-    .preview-image{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      opacity:0;
-      transform:scale(1.06);
-      transition:opacity .6s ease, transform 1.2s ease;
-    }
-
-    .preview-image.loaded{
-      opacity:1;
-      transform:scale(1);
-    }
-
-    .frame-placeholder{
-      position:absolute;
-      inset:0;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      padding:24px;
-      color:rgba(255,255,255,0.72);
-      z-index:2;
-      transition:opacity .35s ease;
-    }
-
-    .frame-placeholder.hidden{
-      opacity:0;
-      pointer-events:none;
-    }
-
-    .placeholder-core{
-      display:grid;
-      gap:10px;
-      place-items:center;
-    }
-
-    .placeholder-icon{
-      width:92px;
-      height:92px;
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      font-size:2rem;
-      border:1px solid rgba(255,255,255,0.12);
-      background:
-        radial-gradient(circle at 35% 35%, rgba(255,255,255,0.16), rgba(255,255,255,0.04) 45%, transparent 70%);
-      box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.06),
-        0 0 45px rgba(201,169,110,0.12);
-    }
-
-    .grid-overlay,
-    .scan-line,
-    .scanner-dots{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-    }
-
-    .grid-overlay{
-      opacity:0;
-      z-index:3;
-      background:
-        radial-gradient(circle at 50% 35%, rgba(201,169,110,0.22), transparent 26%),
-        repeating-linear-gradient(0deg, transparent 0 28px, rgba(255,255,255,0.06) 28px 29px),
-        repeating-linear-gradient(90deg, transparent 0 28px, rgba(255,255,255,0.06) 28px 29px);
-      mix-blend-mode:screen;
-      transition:opacity .35s ease;
-    }
-
-    .scan-line{
-      opacity:0;
-      z-index:5;
-    }
-
-    .scan-line::before{
-      content:"";
-      position:absolute;
-      left:8%;
-      right:8%;
-      top:-30%;
-      height:22%;
-      border-radius:50%;
-      background:linear-gradient(180deg, transparent, rgba(255,255,255,0.72), rgba(201,169,110,0.72), transparent);
-      filter:blur(10px);
-    }
-
-    .scanner-frame.scanning .grid-overlay,
-    .scanner-frame.scanning .scan-line,
-    .scanner-frame.ready .scanner-dots{
-      opacity:1;
-    }
-
-    .scanner-frame.scanning .scan-line::before{
-      animation:scanSweep 2.15s linear infinite;
-    }
-
-    .scanner-dots{
-      z-index:6;
-    }
-
-    .scanner-dots span{
-      position:absolute;
-      left:var(--x);
-      top:var(--y);
-      width:10px;
-      height:10px;
-      margin:-5px 0 0 -5px;
-      border-radius:50%;
-      background:radial-gradient(circle, #fff, rgba(201,169,110,0.88) 45%, transparent 70%);
-      box-shadow:0 0 18px rgba(201,169,110,0.42);
-      opacity:0;
-      transform:scale(0.6);
-      animation:dotPulse 2.4s ease-in-out infinite;
-    }
-
-    .scanner-frame.ready .scanner-dots span,
-    .scanner-frame.scanning .scanner-dots span{
-      opacity:0.78;
-      transform:scale(1);
-    }
-
-    .scanner-dots span:nth-child(odd){
-      animation-delay:-1.2s;
-    }
-
-    .frame-meta{
-      display:flex;
-      justify-content:space-between;
-      gap:18px;
-      flex-wrap:wrap;
-      color:var(--muted);
-      font-size:0.95rem;
-    }
-
-    .frame-meta strong{
-      display:block;
-      color:var(--text);
-      margin-top:6px;
-      font-size:1rem;
-    }
-
-    .privacy-note{
-      display:block;
-      margin-top:6px;
-      color:rgba(255,255,255,0.55);
-      font-size:0.9rem;
-      line-height:1.6;
-    }
-
-    .results-shell{
-      display:grid;
-      grid-template-columns:1.2fr 1fr;
-      gap:24px;
-      margin-top:28px;
-      opacity:0;
-      transform:translateY(18px);
-      transition:opacity .8s ease, transform .8s ease;
-    }
-
-    .results-shell.visible{
-      opacity:1;
-      transform:none;
-    }
-
-    .score-panel{
-      padding:28px;
-      display:grid;
-      grid-template-columns:auto 1fr;
-      gap:24px;
-      align-items:center;
-    }
-
-    .score-circle{
-      --angle:0deg;
-      width:min(280px, 45vw);
-      aspect-ratio:1;
-      border-radius:50%;
-      position:relative;
-      display:grid;
-      place-items:center;
-      background:
-        conic-gradient(from -90deg,
-          rgba(201,169,110,0.98) 0deg,
-          rgba(255,255,255,0.92) var(--angle),
-          rgba(255,255,255,0.08) var(--angle),
-          rgba(255,255,255,0.08) 360deg);
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.12),
-        0 0 60px rgba(201,169,110,0.18),
-        inset 0 0 40px rgba(255,255,255,0.06);
-      flex:0 0 auto;
-    }
-
-    .score-circle::before{
-      content:"";
-      position:absolute;
-      inset:18px;
-      border-radius:50%;
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.07), rgba(10,10,15,0.96) 58%);
-      border:1px solid rgba(255,255,255,0.08);
-    }
-
-    .score-core{
-      position:relative;
-      z-index:1;
-      display:grid;
-      place-items:center;
-      text-align:center;
-    }
-
-    .score-value{
-      font-family:var(--display);
-      font-size:clamp(2.6rem, 6vw, 4rem);
-      line-height:1;
-    }
-
-    .score-denominator{
-      margin-top:6px;
-      color:var(--muted);
-      letter-spacing:0.16em;
-      text-transform:uppercase;
-      font-size:0.78rem;
-    }
-
-    .score-copy h3{
-      margin-top:16px;
-      font-size:clamp(1.5rem, 3vw, 2.2rem);
-    }
-
-    .score-copy p{
-      margin:14px 0 0;
-      color:var(--muted);
-      line-height:1.75;
-    }
-
-    .metrics-grid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:18px;
-    }
-
-    .metric-card{
-      position:relative;
-      overflow:hidden;
-      padding:22px;
-      transition:transform .35s ease, box-shadow .35s ease;
-    }
-
-    .metric-card::before{
-      content:"";
-      position:absolute;
-      inset:auto -20% -40% auto;
-      width:140px;
-      height:140px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(201,169,110,0.16), transparent 70%);
-      pointer-events:none;
-    }
-
-    .metric-card:hover{
-      transform:translateY(-6px);
-      box-shadow:0 28px 60px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-
-    .metric-card[data-metric="Face Proportions"]{
-      grid-column:span 2;
-    }
-
-    .metric-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-    }
-
-    .metric-top h4{
-      font-size:1.03rem;
-      font-family:var(--body);
-      letter-spacing:0.08em;
-      text-transform:uppercase;
-    }
-
-    .metric-value{
-      font-size:1.5rem;
-      font-weight:700;
-      color:var(--gold);
-    }
-
-    .metric-caption{
-      margin-top:8px;
-      color:var(--muted);
-      font-size:0.92rem;
-      line-height:1.65;
-    }
-
-    .metric-bar{
-      height:10px;
-      border-radius:999px;
-      background:rgba(255,255,255,0.08);
-      overflow:hidden;
-      margin-top:18px;
-      border:1px solid rgba(255,255,255,0.05);
-    }
-
-    .metric-fill{
-      display:block;
-      height:100%;
-      width:0;
-      border-radius:inherit;
-      background:linear-gradient(90deg, rgba(201,169,110,0.6), rgba(255,255,255,0.92));
-      box-shadow:0 0 24px rgba(201,169,110,0.24);
-    }
-
-    .results-placeholder,
-    .tips-placeholder{
-      padding:28px;
-      text-align:center;
-      color:var(--muted);
-      margin-top:28px;
-      line-height:1.75;
-    }
-
-        #tipsGrid{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0, 1fr));
-      gap:18px;
-      margin-top:28px;
-      opacity:0;
-      transform:translateY(18px);
-      transition:opacity .8s ease, transform .8s ease;
-    }
-
-    #tipsGrid.visible{
-      opacity:1;
-      transform:none;
-    }
-
-    .tips-card{
-      position:relative;
-      overflow:hidden;
-      padding:24px;
-      transition:transform .35s ease, box-shadow .35s ease;
-    }
-
-    .tips-card::before{
-      content:"";
-      position:absolute;
-      inset:0 auto auto 0;
-      width:100%;
-      height:1px;
-      background:linear-gradient(90deg, rgba(201,169,110,0.5), transparent 60%);
-    }
-
-    .tips-card:hover{
-      transform:translateY(-6px);
-      box-shadow:0 28px 60px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-
-    .tips-card h4{
-      font-size:1rem;
-      font-family:var(--body);
-      letter-spacing:0.18em;
-      text-transform:uppercase;
-      color:var(--gold);
-    }
-
-    .tips-card ul{
-      margin:18px 0 0;
-      padding:0;
-      list-style:none;
-      display:grid;
-      gap:12px;
-    }
-
-    .tips-card li{
-      position:relative;
-      padding-left:20px;
-      color:var(--muted);
-      line-height:1.65;
-    }
-
-    .tips-card li::before{
-      content:"✦";
-      position:absolute;
-      left:0;
-      top:0;
-      color:#fff;
-    }
-
-    .footer{
-      padding:24px 20px 40px;
-    }
-
-    .footer-shell{
-      max-width:1160px;
-      margin:0 auto;
-      padding:22px 24px;
-      border-radius:24px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:18px;
-      flex-wrap:wrap;
-    }
-
-    .footer-copy strong{
-      display:block;
-      letter-spacing:0.22em;
-      font-size:0.9rem;
-      text-transform:uppercase;
-    }
-
-    .footer-copy span{
-      display:block;
-      margin-top:6px;
-      color:var(--muted);
-      font-size:0.95rem;
-    }
-
-    .footer-links{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .footer-links a{
-      padding:10px 14px;
-      border-radius:999px;
-      color:var(--muted);
-      transition:background .3s ease, color .3s ease, transform .3s ease;
-    }
-
-    .footer-links a:hover{
-      background:rgba(255,255,255,0.06);
-      color:#fff;
-      transform:translateY(-1px);
-    }
-
-    .hidden{display:none !important}
-
-    .reveal{
-      opacity:0;
-      transform:translateY(18px) scale(0.985);
-      transition:opacity .8s cubic-bezier(.2,.8,.2,1), transform .8s cubic-bezier(.2,.8,.2,1);
-    }
-
-    .reveal.visible{
-      opacity:1;
-      transform:none;
-    }
-
-    @keyframes float{
-      0%,100%{transform:translateY(0)}
-      50%{transform:translateY(-12px)}
-    }
-
-    @keyframes breathe{
-      0%,100%{opacity:0.72;transform:translate(-50%,-50%) scale(1)}
-      50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
-    }
-
-    @keyframes scanSweep{
-      0%{transform:translateY(-15%)}
-      100%{transform:translateY(120%)}
-    }
-
-    @keyframes dotPulse{
-      0%,100%{transform:scale(0.75);opacity:0.55}
-      50%{transform:scale(1.3);opacity:1}
-    }
-
-    @media (max-width: 980px){
-      .scan-layout,
-      .results-shell{
-        grid-template-columns:1fr;
-      }
-      .score-panel{
-        grid-template-columns:1fr;
-        justify-items:center;
-        text-align:center;
-      }
-      #tipsGrid{
-        grid-template-columns:repeat(2, minmax(0, 1fr));
-      }
-      .chip-1,.chip-2,.chip-3{
-        display:none;
-      }
-    }
-
-    @media (max-width: 680px){
-      .topbar{
-        top:12px;
-        width:calc(100% - 16px);
-        padding:12px 14px;
-      }
-      .nav-links{
-        gap:6px;
-        font-size:0.88rem;
-      }
-      .nav-links a{
-        padding:8px 10px;
-      }
-      .hero{
-        padding-top:96px;
-      }
-      .hero-panel{
-        border-radius:26px;
-      }
-      .metrics-grid,
-      #tipsGrid{
-        grid-template-columns:1fr;
-      }
-      .metric-card[data-metric="Face Proportions"]{
-        grid-column:auto;
-      }
-      .upload-panel,
-      .preview-panel,
-      .score-panel,
-      .metric-card,
-      .tips-card,
-      .results-placeholder,
-      .tips-placeholder{
-        border-radius:24px;
-      }
-      .score-circle{
-        width:min(72vw, 260px);
-      }
-      .frame-meta{
-        flex-direction:column;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      *{
-        animation-duration:0.01ms !important;
-        animation-iteration-count:1 !important;
-        transition-duration:0.01ms !important;
-        scroll-behavior:auto !important;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Heavenly</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+font-family:Inter;
+background:#07080d;
+color:white;
+}
+
+/* particle background */
+
+#bg{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-1;
+}
+
+/* navbar */
+
+.nav{
+position:fixed;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+background:rgba(255,255,255,.05);
+backdrop-filter:blur(20px);
+border-radius:40px;
+padding:12px 30px;
+display:flex;
+gap:40px;
+align-items:center;
+border:1px solid rgba(255,255,255,.1);
+}
+
+.logo{
+font-family:Cinzel;
+letter-spacing:4px;
+}
+
+.nav a{
+color:#ccc;
+text-decoration:none;
+}
+
+/* hero */
+
+.hero{
+padding-top:160px;
+display:flex;
+justify-content:center;
+}
+
+.hero-card{
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.1);
+border-radius:30px;
+padding:50px;
+width:80%;
+max-width:500px;
+text-align:center;
+backdrop-filter:blur(30px);
+}
+
+.badge{
+border:1px solid rgba(255,255,255,.1);
+border-radius:30px;
+padding:8px 20px;
+display:inline-block;
+margin-bottom:20px;
+font-size:13px;
+letter-spacing:2px;
+color:#aaa;
+}
+
+h1{
+font-family:Cinzel;
+font-size:48px;
+margin:10px 0;
+}
+
+.subtitle{
+color:#d2b26f;
+letter-spacing:4px;
+margin-bottom:10px;
+}
+
+.desc{
+color:#aaa;
+margin-bottom:30px;
+}
+
+.btns{
+display:flex;
+gap:15px;
+justify-content:center;
+}
+
+.btn{
+padding:14px 26px;
+border-radius:30px;
+border:none;
+font-weight:600;
+cursor:pointer;
+}
+
+.gold{
+background:linear-gradient(45deg,#f3e2b4,#caa75c);
+}
+
+.dark{
+background:rgba(255,255,255,.05);
+color:white;
+border:1px solid rgba(255,255,255,.1);
+}
+
+/* sections */
+
+.section{
+padding:120px 10%;
+text-align:center;
+}
+
+/* upload */
+
+.upload{
+border:2px dashed rgba(255,255,255,.1);
+border-radius:30px;
+padding:50px;
+margin-top:40px;
+background:rgba(255,255,255,.04);
+}
+
+.upload input{
+display:none;
+}
+
+.upload label{
+cursor:pointer;
+}
+
+.status{
+margin-top:40px;
+background:rgba(255,255,255,.05);
+border-radius:20px;
+padding:25px;
+border:1px solid rgba(255,255,255,.1);
+}
+
+.state{
+margin-top:20px;
+color:#aaa;
+}
+
+/* portrait box */
+
+.portrait{
+margin-top:40px;
+border-radius:30px;
+padding:80px;
+background:rgba(255,255,255,.04);
+border:1px solid rgba(255,255,255,.1);
+}
+
+/* results */
+
+.result-card{
+margin-top:40px;
+border-radius:30px;
+padding:40px;
+background:rgba(255,255,255,.04);
+border:1px solid rgba(255,255,255,.1);
+}
+
+/* footer */
+
+.footer{
+margin-top:100px;
+padding:40px;
+background:rgba(255,255,255,.05);
+border-radius:30px;
+text-align:center;
+}
+
+</style>
 </head>
+
 <body>
-  <canvas id="bgCanvas" aria-hidden="true"></canvas>
-  <div class="bg-aura aura-1" aria-hidden="true"></div>
-  <div class="bg-aura aura-2" aria-hidden="true"></div>
-
-  <div class="site-shell">
-    <header class="topbar glass">
-      <a class="brand" href="#home" aria-label="HEAVENLY Home">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span>HEAVENLY</span>
-      </a>
-      <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#home">Home</a>
-        <a href="#scan">Scan</a>
-        <a href="#results">Results</a>
-      </nav>
-    </header>
-
-    <main>
-      <section class="section hero" id="home">
-        <div class="section-inner">
-          <div class="hero-halo" aria-hidden="true"></div>
-
-          <div class="float-chip glass chip-1">✨ Symmetry Mapping</div>
-          <div class="float-chip glass chip-2">👁️ Feature Harmony</div>
-          <div class="float-chip glass chip-3">🜂 Premium Skin Insights</div>
-
-          <div class="hero-panel glass reveal">
-            <span class="eyebrow">Divine Intelligence · Futuristic Aesthetics</span>
-            <h1>HEAVENLY</h1>
-            <h2>AI Aesthetic Analyzer</h2>
-            <p>Discover your aesthetic potential.</p>
-            <div class="hero-actions">
-              <a class="btn btn-primary" href="#scan">Scan My Face</a>
-              <a class="btn btn-secondary" href="#results">Learn More</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="scan">
-        <div class="section-inner">
-          <div class="section-heading reveal">
-            <span class="eyebrow">Simulated Neural Scan</span>
-            <h2>Upload a portrait for a cinematic AI-style analysis.</h2>
-            <p>Heavenly recreates the feeling of a luxury facial scan through glowing overlays, immersive motion, and elegant result cards — all locally in your browser.</p>
-          </div>
-
-          <div class="scan-layout">
-            <aside class="upload-panel glass reveal">
-              <label class="upload-drop" for="imageUpload">
-                <input id="imageUpload" type="file" accept="image/*" aria-label="Upload your portrait" />
-                <div>
-                  <div class="upload-graphic" aria-hidden="true">☁️</div>
-                  <div class="upload-copy">
-                    <strong>Upload Image</strong>
-                    <span>Front-facing portrait recommended for the most cinematic simulation.</span>
-                  </div>
-                </div>
-              </label>
-
-              <div class="status-box">
-                <div class="status-label">Scan Status</div>
-                <div class="status-current" id="statusCurrent" aria-live="polite">Upload a portrait to begin the simulated analysis.</div>
-                <ul class="status-list" id="statusList">
-                  <li class="status-item">Analyzing facial symmetry...</li>
-                  <li class="status-item">Evaluating facial proportions...</li>
-                  <li class="status-item">Calculating aesthetic score...</li>
-                </ul>
-              </div>
-            </aside>
-
-            <div class="preview-panel glass reveal">
-              <div class="scanner-frame" id="scannerFrame">
-                <img class="preview-image" id="previewImage" alt="Uploaded portrait preview" />
-                <div class="frame-placeholder" id="framePlaceholder">
-                  <div class="placeholder-core">
-                    <div class="placeholder-icon" aria-hidden="true">✦</div>
-                    <strong>Your portrait appears here</strong>
-                    <span>Elegant scan overlays activate after upload.</span>
-                  </div>
-                </div>
-                <div class="grid-overlay" aria-hidden="true"></div>
-                <div class="scan-line" aria-hidden="true"></div>
-                <div class="scanner-dots" aria-hidden="true">
-                  <span style="--x:23%;--y:24%;"></span>
-                  <span style="--x:50%;--y:20%;"></span>
-                  <span style="--x:76%;--y:26%;"></span>
-                  <span style="--x:31%;--y:42%;"></span>
-                  <span style="--x:69%;--y:42%;"></span>
-                  <span style="--x:38%;--y:60%;"></span>
-                  <span style="--x:50%;--y:69%;"></span>
-                  <span style="--x:62%;--y:60%;"></span>
-                </div>
-              </div>
-
-              <div class="frame-meta">
-                <div>
-                  <div class="status-label">Scan State</div>
-                  <strong id="scanStateLabel">Awaiting upload</strong>
-                </div>
-                <div>
-                  <div class="status-label">Privacy</div>
-                  <span class="privacy-note" id="fileHint">Simulation only · no image leaves your browser</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="results">
-        <div class="section-inner">
-          <div class="section-heading reveal">
-            <span class="eyebrow">Aesthetic Results</span>
-            <h2>Premium scoring with a polished, cinematic reveal.</h2>
-            <p>After the simulated scan completes, Heavenly unveils an overall aesthetic score with refined category metrics and animated visual feedback.</p>
-          </div>
-
-          <div class="results-placeholder glass reveal" id="resultsPlaceholder">
-            Complete a luminous scan to reveal your simulated overall score and category breakdown.
-          </div>
-
-          <div class="results-shell" id="resultsContent" hidden>
-            <div class="score-panel glass">
-              <div class="score-circle" id="scoreCircle">
-                <div class="score-core">
-                  <div class="score-value" id="scoreValue">0.0</div>
-                  <div class="score-denominator">/ 10</div>
-                </div>
-              </div>
-              <div class="score-copy">
-                <span class="eyebrow">Overall Aesthetic Score</span>
-                <h3>Refined, balanced, and striking.</h3>
-                <p id="scoreSummary">A refined simulation will appear here once the scan completes.</p>
-              </div>
-            </div>
-
-            <div class="metrics-grid" aria-label="Category scores">
-              <article class="metric-card glass" data-metric="Symmetry">
-                <div class="metric-top">
-                  <h4>Symmetry</h4>
-                  <div class="metric-value">0.0</div>
-                </div>
-                <div class="metric-caption">Facial balance and visual alignment.</div>
-                <div class="metric-bar"><span class="metric-fill"></span></div>
-              </article>
-
-              <article class="metric-card glass" data-metric="Jawline">
-                <div class="metric-top">
-                  <h4>Jawline</h4>
-                  <div class="metric-value">0.0</div>
-                </div>
-                <div class="metric-caption">Contour definition and structural presence.</div>
-                <div class="metric-bar"><span class="metric-fill"></span></div>
-              </article>
-
-              <article class="metric-card glass" data-metric="Eyes">
-                <div class="metric-top">
-                  <h4>Eyes</h4>
-                  <div class="metric-value">0.0</div>
-                </div>
-                <div class="metric-caption">Framing, openness, and focal impact.</div>
-                <div class="metric-bar"><span class="metric-fill"></span></div>
-              </article>
-
-              <article class="metric-card glass" data-metric="Skin">
-                <div class="metric-top">
-                  <h4>Skin</h4>
-                  <div class="metric-value">0.0</div>
-                </div>
-                <div class="metric-caption">Texture, clarity, and visible glow.</div>
-                <div class="metric-bar"><span class="metric-fill"></span></div>
-              </article>
-
-              <article class="metric-card glass" data-metric="Face Proportions">
-                <div class="metric-top">
-                  <h4>Face Proportions</h4>
-                  <div class="metric-value">0.0</div>
-                </div>
-                <div class="metric-caption">Feature harmony, ratio, and balanced composition.</div>
-                <div class="metric-bar"><span class="metric-fill"></span></div>
-              </article>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="tips">
-        <div class="section-inner">
-          <div class="section-heading reveal">
-            <span class="eyebrow">Improvement Tips</span>
-            <h2>Actionable refinement suggestions.</h2>
-            <p>Below the results, Heavenly surfaces elegant grooming and styling recommendations inspired by your simulated metrics.</p>
-          </div>
-
-          <div class="tips-placeholder glass reveal" id="tipsPlaceholder">
-            Personalized tips will appear here after your scan completes.
-          </div>
-
-          <div id="tipsGrid" hidden aria-label="Improvement tips"></div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-shell glass">
-        <div class="footer-copy">
-          <strong>Heavenly</strong>
-          <span>“Discover your aesthetic potential.”</span>
-        </div>
-        <div class="footer-links">
-          <a href="#home">Home</a>
-          <a href="#scan">Scan</a>
-          <a href="#results">Results</a>
-        </div>
-      </div>
-    </footer>
-  </div>
-
-  <script>
-    /* script.js */
-    const imageInput = document.getElementById('imageUpload');
-    const previewImage = document.getElementById('previewImage');
-    const scannerFrame = document.getElementById('scannerFrame');
-    const framePlaceholder = document.getElementById('framePlaceholder');
-    const scanStateLabel = document.getElementById('scanStateLabel');
-    const fileHint = document.getElementById('fileHint');
-    const statusCurrent = document.getElementById('statusCurrent');
-    const statusItems = Array.from(document.querySelectorAll('.status-item'));
-
-    const resultsPlaceholder = document.getElementById('resultsPlaceholder');
-    const resultsContent = document.getElementById('resultsContent');
-    const scoreCircle = document.getElementById('scoreCircle');
-    const scoreValue = document.getElementById('scoreValue');
-    const scoreSummary = document.getElementById('scoreSummary');
-    const metricCards = Array.from(document.querySelectorAll('.metric-card'));
-
-    const tipsPlaceholder = document.getElementById('tipsPlaceholder');
-    const tipsGrid = document.getElementById('tipsGrid');
-
-    let scanTimers = [];
-    let scanRun = 0;
-    let currentSeed = 1;
-
-    function clearScanTimers() {
-      scanTimers.forEach(clearTimeout);
-      scanTimers = [];
-    }
-
-    function resetStatusSteps() {
-      statusItems.forEach(item => item.classList.remove('active', 'done'));
-      statusCurrent.textContent = 'Upload a portrait to begin the simulated analysis.';
-    }
-
-    function prepareForScan() {
-      clearScanTimers();
-
-      resultsContent.hidden = true;
-      resultsContent.classList.remove('visible');
-
-      tipsGrid.hidden = true;
-      tipsGrid.classList.remove('visible');
-      tipsGrid.innerHTML = '';
-
-      resultsPlaceholder.classList.remove('hidden');
-      tipsPlaceholder.classList.remove('hidden');
-
-      scoreValue.textContent = '0.0';
-      scoreCircle.style.setProperty('--angle', '0deg');
-      scoreSummary.textContent = 'A refined simulation will appear here once the scan completes.';
-
-      metricCards.forEach(card => {
-        const value = card.querySelector('.metric-value');
-        const fill = card.querySelector('.metric-fill');
-        value.textContent = '0.0';
-        fill.style.width = '0%';
-      });
-
-      resetStatusSteps();
-    }
-
-    function createSeed(file) {
-      const input = `${file.name}-${file.size}-${file.lastModified}`;
-      let hash = 2166136261;
-      for (let i = 0; i < input.length; i++) {
-        hash ^= input.charCodeAt(i);
-        hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
-      }
-      return hash >>> 0 || 1;
-    }
-
-    function mulberry32(a) {
-      return function () {
-        let t = (a += 0x6D2B79F5);
-        t = Math.imul(t ^ (t >>> 15), t | 1);
-        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-      };
-    }
-
-    function ranged(rand, min, max) {
-      return +(min + rand() * (max - min)).toFixed(1);
-    }
-
-    function buildResults(seed) {
-      const rand = mulberry32(seed);
-
-      const metrics = {
-        'Symmetry': ranged(rand, 6.4, 9.2),
-        'Jawline': ranged(rand, 5.8, 8.9),
-        'Eyes': ranged(rand, 6.3, 9.4),
-        'Skin': ranged(rand, 5.9, 9.1),
-        'Face Proportions': ranged(rand, 6.1, 9.0)
-      };
-
-      const overallRaw =
-        (metrics['Symmetry'] * 1.1 +
-          metrics['Face Proportions'] * 1.1 +
-          metrics['Jawline'] +
-          metrics['Eyes'] +
-          metrics['Skin']) / 5.2;
-
-      const overall = +overallRaw.toFixed(1);
-      return { overall, metrics };
-    }
-
-    function buildSummary(metrics, overall) {
-      const standout = Object.entries(metrics).sort((a, b) => b[1] - a[1])[0][0].toLowerCase();
-      if (overall >= 8.5) {
-        return `Exceptional harmony with luminous balance and premium facial cohesion. Standout area: ${standout}.`;
-      }
-      if (overall >= 7.5) {
-        return `Strong visual harmony with refined structure and striking focal points. Standout area: ${standout}.`;
-      }
-      if (overall >= 6.5) {
-        return `A balanced foundation with several features ready to be elevated through grooming and styling. Standout area: ${standout}.`;
-      }
-      return `An encouraging base with clear room for refinement and stronger overall framing. Standout area: ${standout}.`;
-    }
-
-    function animateCount(target, duration, onUpdate, runId) {
-      const start = performance.now();
-      function frame(now) {
-        if (runId !== scanRun) return;
-        const t = Math.min(1, (now - start) / duration);
-        const eased = 1 - Math.pow(1 - t, 3);
-        const value = target * eased;
-        onUpdate(value);
-        if (t < 1) requestAnimationFrame(frame);
-      }
-      requestAnimationFrame(frame);
-    }
-
-    function renderTips(metrics) {
-      const tipMap = {
-        'Jawline': {
-          title: 'JAWLINE',
-          items: [
-            'Reduce body fat percentage',
-            'Consider facial hair styles'
-          ]
-        },
-        'Skin': {
-          title: 'SKIN',
-          items: [
-            'Improve hydration',
-            'Use a skincare routine'
-          ]
-        },
-        'Eyes': {
-          title: 'EYES',
-          items: [
-            'Prioritize sleep and under-eye care',
-            'Refine brow shape for stronger framing'
-          ]
-        },
-        'Symmetry': {
-          title: 'SYMMETRY',
-          items: [
-            'Keep grooming consistent on both sides',
-            'Use posture and angles that flatter alignment'
-          ]
-        },
-        'Face Proportions': {
-          title: 'HAIR',
-          items: [
-            'Choose hairstyles that match your face shape',
-                        'Keep side volume balanced with your profile'
-          ]
-        }
-      };
-
-      const sorted = Object.entries(metrics).sort((a, b) => a[1] - b[1]).map(([key]) => key);
-      const selected = [];
-
-      sorted.slice(0, 3).forEach(key => {
-        if (tipMap[key]) selected.push({ key, ...tipMap[key] });
-      });
-
-      if (!selected.find(item => item.key === 'Face Proportions')) {
-        selected.push({ key: 'Face Proportions', ...tipMap['Face Proportions'] });
-      }
-
-      tipsGrid.innerHTML = selected.slice(0, 4).map(card => `
-        <article class="tips-card glass">
-          <h4>${card.title}</h4>
-          <ul>
-            ${card.items.map(item => `<li>${item}</li>`).join('')}
-          </ul>
-        </article>
-      `).join('');
-    }
-
-    function showResults(data, runId) {
-      if (runId !== scanRun) return;
-
-      resultsPlaceholder.classList.add('hidden');
-      tipsPlaceholder.classList.add('hidden');
-
-      resultsContent.hidden = false;
-      tipsGrid.hidden = false;
-
-      renderTips(data.metrics);
-
-      requestAnimationFrame(() => {
-        resultsContent.classList.add('visible');
-        tipsGrid.classList.add('visible');
-      });
-
-      scoreSummary.textContent = buildSummary(data.metrics, data.overall);
-
-      animateCount(data.overall, 1700, value => {
-        if (runId !== scanRun) return;
-        scoreValue.textContent = value.toFixed(1);
-        scoreCircle.style.setProperty('--angle', `${(value / 10) * 360}deg`);
-      }, runId);
-
-      metricCards.forEach((card, index) => {
-        const key = card.dataset.metric;
-        const target = data.metrics[key];
-        const valueEl = card.querySelector('.metric-value');
-        const fillEl = card.querySelector('.metric-fill');
-
-        animateCount(target, 1200 + index * 120, value => {
-          if (runId !== scanRun) return;
-          valueEl.textContent = value.toFixed(1);
-          fillEl.style.width = `${(value / 10) * 100}%`;
-        }, runId);
-      });
-
-      setTimeout(() => {
-        if (runId !== scanRun) return;
-        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 280);
-    }
-
-    function startScan() {
-      scanRun += 1;
-      const runId = scanRun;
-      prepareForScan();
-
-      scannerFrame.classList.add('scanning');
-      scanStateLabel.textContent = 'Running heavenly scan';
-
-      const statuses = [
-        'Analyzing facial symmetry...',
-        'Evaluating facial proportions...',
-        'Calculating aesthetic score...'
-      ];
-
-      statuses.forEach((message, index) => {
-        scanTimers.push(setTimeout(() => {
-          if (runId !== scanRun) return;
-          statusCurrent.textContent = message;
-          statusItems.forEach((item, itemIndex) => {
-            item.classList.toggle('active', itemIndex === index);
-            item.classList.toggle('done', itemIndex < index);
-          });
-        }, index * 1450));
-      });
-
-      scanTimers.push(setTimeout(() => {
-        if (runId !== scanRun) return;
-
-        statusItems.forEach(item => {
-          item.classList.remove('active');
-          item.classList.add('done');
-        });
-
-        statusCurrent.textContent = 'Simulation complete. Rendering results...';
-        scanStateLabel.textContent = 'Analysis complete';
-        scannerFrame.classList.remove('scanning');
-
-        const data = buildResults(currentSeed);
-        showResults(data, runId);
-      }, statuses.length * 1450 + 550));
-    }
-
-    imageInput.addEventListener('click', () => {
-      imageInput.value = '';
-    });
-
-    imageInput.addEventListener('change', event => {
-      const file = event.target.files && event.target.files[0];
-      if (!file || !file.type.startsWith('image/')) return;
-
-      currentSeed = createSeed(file);
-      previewImage.classList.remove('loaded');
-
-      const reader = new FileReader();
-      reader.onload = e => {
-        previewImage.onload = () => {
-          framePlaceholder.classList.add('hidden');
-          previewImage.classList.add('loaded');
-          scannerFrame.classList.add('ready');
-          scanStateLabel.textContent = 'Portrait loaded';
-          fileHint.textContent = `${file.name} · local preview only`;
-          startScan();
-        };
-        previewImage.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-
-    resetStatusSteps();
-
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.14 });
-
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-    // Cinematic particle background
-    const canvas = document.getElementById('bgCanvas');
-    const ctx = canvas.getContext('2d');
-
-    let width = 0;
-    let height = 0;
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
-    let particles = [];
-    const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-
-    function resizeCanvas() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      createParticles();
-    }
-
-    function createParticles() {
-      const count = Math.max(55, Math.min(110, Math.floor((width * height) / 16500)));
-      particles = Array.from({ length: count }, () => ({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        z: Math.random(),
-        r: Math.random() * 1.6 + 0.6,
-        vx: (Math.random() - 0.5) * 0.06,
-        vy: 0.02 + Math.random() * 0.18,
-        gold: Math.random() > 0.78,
-        dx: 0,
-        dy: 0
-      }));
-    }
-
-    function animateBackground() {
-      ctx.clearRect(0, 0, width, height);
-
-      pointer.x += (pointer.tx - pointer.x) * 0.035;
-      pointer.y += (pointer.ty - pointer.y) * 0.035;
-
-      const auraX = width * (0.5 + pointer.x * 0.04);
-      const auraY = height * (0.28 + pointer.y * 0.05);
-      const aura = ctx.createRadialGradient(auraX, auraY, 0, auraX, auraY, Math.max(width, height) * 0.45);
-      aura.addColorStop(0, 'rgba(255,255,255,0.06)');
-      aura.addColorStop(0.28, 'rgba(201,169,110,0.05)');
-      aura.addColorStop(1, 'rgba(10,10,15,0)');
-      ctx.fillStyle = aura;
-      ctx.fillRect(0, 0, width, height);
-
-      ctx.globalCompositeOperation = 'lighter';
-
-      particles.forEach(p => {
-        p.x += p.vx * (0.4 + p.z * 1.3);
-        p.y += p.vy * (0.4 + p.z * 1.8);
-
-        if (p.x < -30) p.x = width + 30;
-        if (p.x > width + 30) p.x = -30;
-        if (p.y > height + 30) {
-          p.y = -30;
-          p.x = Math.random() * width;
-        }
-
-        p.dx = p.x + pointer.x * 18 * (0.4 + p.z);
-        p.dy = p.y + pointer.y * 12 * (0.4 + p.z);
-
-        const alpha = 0.15 + p.z * 0.42;
-        const radius = p.r * (0.8 + p.z * 1.8);
-        const color = p.gold
-          ? `rgba(201,169,110,${alpha})`
-          : `rgba(255,255,255,${alpha})`;
-
-        ctx.beginPath();
-        ctx.fillStyle = color;
-        ctx.shadowBlur = 20 * (0.4 + p.z);
-        ctx.shadowColor = p.gold ? 'rgba(201,169,110,0.5)' : 'rgba(255,255,255,0.45)';
-        ctx.arc(p.dx, p.dy, radius, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      ctx.shadowBlur = 0;
-
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const a = particles[i];
-          const b = particles[j];
-          const dx = a.dx - b.dx;
-          const dy = a.dy - b.dy;
-          const dist = Math.hypot(dx, dy);
-
-          if (dist < 90) {
-            const opacity = (1 - dist / 90) * 0.09;
-            ctx.beginPath();
-            ctx.strokeStyle = (a.gold || b.gold)
-              ? `rgba(201,169,110,${opacity})`
-              : `rgba(255,255,255,${opacity * 0.9})`;
-            ctx.lineWidth = 0.8;
-            ctx.moveTo(a.dx, a.dy);
-            ctx.lineTo(b.dx, b.dy);
-            ctx.stroke();
-          }
-        }
-      }
-
-      ctx.globalCompositeOperation = 'source-over';
-      requestAnimationFrame(animateBackground);
-    }
-
-    window.addEventListener('resize', resizeCanvas);
-    window.addEventListener('pointermove', e => {
-      pointer.tx = (e.clientX / Math.max(width, 1) - 0.5) * 2;
-      pointer.ty = (e.clientY / Math.max(height, 1) - 0.5) * 2;
-    });
-    document.addEventListener('mouseleave', () => {
-      pointer.tx = 0;
-      pointer.ty = 0;
-    });
-
-    resizeCanvas();
-    animateBackground();
-  </script>
+
+<canvas id="bg"></canvas>
+
+<div class="nav">
+
+<div class="logo">HEAVENLY</div>
+
+<a href="#">Home</a>
+<a href="#">Scan</a>
+<a href="#">Results</a>
+
+</div>
+
+<div class="hero">
+
+<div class="hero-card">
+
+<div class="badge">DIVINE INTELLIGENCE · FUTURISTIC AESTHETICS</div>
+
+<h1>HEAVENLY</h1>
+
+<div class="subtitle">AI AESTHETIC ANALYZER</div>
+
+<div class="desc">Discover your aesthetic potential.</div>
+
+<div class="btns">
+
+<button class="btn gold">Scan My Face</button>
+
+<button class="btn dark">Learn More</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="badge">SIMULATED NEURAL SCAN</div>
+
+<h2>Upload a portrait for a cinematic AI-style analysis.</h2>
+
+<p style="color:#aaa">Heavenly recreates the feeling of a luxury facial scan through glowing overlays and elegant result cards.</p>
+
+<div class="upload">
+
+<label>
+
+Upload Image
+
+<input type="file">
+
+</label>
+
+</div>
+
+<div class="status">
+
+<b>SCAN STATUS</b>
+
+<p>Upload a portrait to begin the simulated analysis.</p>
+
+<div class="state">
+
+Analyzing facial symmetry...<br>
+Evaluating facial proportions...<br>
+Calculating aesthetic score...
+
+</div>
+
+</div>
+
+<div class="portrait">
+
+Your portrait appears here
+
+</div>
+
+<div class="state">
+
+SCAN STATE<br>
+Awaiting upload
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="badge">AESTHETIC RESULTS</div>
+
+<h2>Premium scoring with a polished cinematic reveal.</h2>
+
+<p style="color:#aaa">Complete a luminous scan to reveal your simulated overall score.</p>
+
+<div class="result-card">
+
+Results will appear here
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="badge">IMPROVEMENT TIPS</div>
+
+<h2>Actionable refinement suggestions.</h2>
+
+<p style="color:#aaa">Personalized tips will appear after your scan completes.</p>
+
+<div class="result-card">
+
+Tips appear here
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="footer">
+
+<h3>HEAVENLY</h3>
+
+<p>"Discover your aesthetic potential."</p>
+
+Home · Scan · Results
+
+</div>
+
+</div>
+
+<script>
+
+/* background particles */
+
+const canvas=document.getElementById("bg")
+const ctx=canvas.getContext("2d")
+
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+
+let particles=[]
+
+for(let i=0;i<120;i++){
+
+particles.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2,
+dx:(Math.random()-0.5)*0.4,
+dy:(Math.random()-0.5)*0.4
+})
+
+}
+
+function animate(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+particles.forEach(p=>{
+
+ctx.beginPath()
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
+ctx.fillStyle="rgba(255,255,255,.6)"
+ctx.fill()
+
+p.x+=p.dx
+p.y+=p.dy
+
+if(p.x<0||p.x>canvas.width)p.dx*=-1
+if(p.y<0||p.y>canvas.height)p.dy*=-1
+
+})
+
+requestAnimationFrame(animate)
+
+}
+
+animate()
+
+</script>
+
 </body>
 </html>
