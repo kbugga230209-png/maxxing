@@ -8,6 +8,8 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1/bundled/lenis.min.js"></script>
+
 <style>
 
 body{
@@ -15,17 +17,51 @@ margin:0;
 font-family:Inter;
 background:#07080d;
 color:white;
+overflow-x:hidden;
 }
 
-/* particle background */
+/* background glow */
 
-#bg{
+body::before{
+content:"";
+position:fixed;
+width:100%;
+height:100%;
+background:radial-gradient(circle at 50% 10%,rgba(201,169,110,.25),transparent 60%);
+z-index:-3;
+}
+
+/* particles */
+
+#particles{
 position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
-z-index:-1;
+z-index:-2;
+}
+
+/* floating spheres */
+
+.glass{
+position:fixed;
+border-radius:50%;
+background:rgba(255,255,255,.06);
+backdrop-filter:blur(40px);
+border:1px solid rgba(255,255,255,.15);
+box-shadow:0 0 120px rgba(201,169,110,.4);
+animation:float 10s infinite ease-in-out;
+}
+
+.g1{width:160px;height:160px;top:15%;left:8%;}
+.g2{width:120px;height:120px;top:70%;left:80%;}
+.g3{width:200px;height:200px;top:85%;left:25%;}
+
+@keyframes float{
+0%{transform:translateY(0)}
+50%{transform:translateY(-40px)}
+100%{transform:translateY(0)}
 }
 
 /* navbar */
@@ -43,6 +79,7 @@ display:flex;
 gap:40px;
 align-items:center;
 border:1px solid rgba(255,255,255,.1);
+z-index:5;
 }
 
 .logo{
@@ -53,6 +90,7 @@ letter-spacing:4px;
 .nav a{
 color:#ccc;
 text-decoration:none;
+cursor:pointer;
 }
 
 /* hero */
@@ -69,9 +107,11 @@ border:1px solid rgba(255,255,255,.1);
 border-radius:30px;
 padding:50px;
 width:80%;
-max-width:500px;
+max-width:520px;
 text-align:center;
 backdrop-filter:blur(30px);
+box-shadow:0 0 100px rgba(201,169,110,.2);
+animation:float 6s infinite ease-in-out;
 }
 
 .badge{
@@ -133,7 +173,7 @@ padding:120px 10%;
 text-align:center;
 }
 
-/* upload */
+/* upload box */
 
 .upload{
 border:2px dashed rgba(255,255,255,.1);
@@ -141,30 +181,14 @@ border-radius:30px;
 padding:50px;
 margin-top:40px;
 background:rgba(255,255,255,.04);
+cursor:pointer;
 }
 
 .upload input{
 display:none;
 }
 
-.upload label{
-cursor:pointer;
-}
-
-.status{
-margin-top:40px;
-background:rgba(255,255,255,.05);
-border-radius:20px;
-padding:25px;
-border:1px solid rgba(255,255,255,.1);
-}
-
-.state{
-margin-top:20px;
-color:#aaa;
-}
-
-/* portrait box */
+/* portrait */
 
 .portrait{
 margin-top:40px;
@@ -174,9 +198,9 @@ background:rgba(255,255,255,.04);
 border:1px solid rgba(255,255,255,.1);
 }
 
-/* results */
+/* cards */
 
-.result-card{
+.card{
 margin-top:40px;
 border-radius:30px;
 padding:40px;
@@ -199,19 +223,23 @@ text-align:center;
 
 <body>
 
-<canvas id="bg"></canvas>
+<canvas id="particles"></canvas>
+
+<div class="glass g1"></div>
+<div class="glass g2"></div>
+<div class="glass g3"></div>
 
 <div class="nav">
 
 <div class="logo">HEAVENLY</div>
 
-<a href="#">Home</a>
-<a href="#">Scan</a>
-<a href="#">Results</a>
+<a onclick="scrollToSection('hero')">Home</a>
+<a onclick="scrollToSection('scan')">Scan</a>
+<a onclick="scrollToSection('results')">Results</a>
 
 </div>
 
-<div class="hero">
+<div class="hero" id="hero">
 
 <div class="hero-card">
 
@@ -225,9 +253,13 @@ text-align:center;
 
 <div class="btns">
 
-<button class="btn gold">Scan My Face</button>
+<button class="btn gold" onclick="scrollToSection('scan')">
+Scan My Face
+</button>
 
-<button class="btn dark">Learn More</button>
+<button class="btn dark" onclick="scrollToSection('results')">
+Learn More
+</button>
 
 </div>
 
@@ -235,66 +267,35 @@ text-align:center;
 
 </div>
 
-<div class="section">
+<div class="section" id="scan">
 
 <div class="badge">SIMULATED NEURAL SCAN</div>
 
-<h2>Upload a portrait for a cinematic AI-style analysis.</h2>
+<h2>Upload a portrait for cinematic analysis</h2>
 
-<p style="color:#aaa">Heavenly recreates the feeling of a luxury facial scan through glowing overlays and elegant result cards.</p>
+<div class="upload" id="uploadBox">
 
-<div class="upload">
+<input type="file" id="imageUpload" accept="image/*">
 
-<label>
-
-Upload Image
-
-<input type="file">
-
-</label>
+<p>☁️ Upload Image</p>
 
 </div>
 
-<div class="status">
-
-<b>SCAN STATUS</b>
-
-<p>Upload a portrait to begin the simulated analysis.</p>
-
-<div class="state">
-
-Analyzing facial symmetry...<br>
-Evaluating facial proportions...<br>
-Calculating aesthetic score...
-
-</div>
-
-</div>
-
-<div class="portrait">
+<div class="portrait" id="portraitBox">
 
 Your portrait appears here
 
 </div>
 
-<div class="state">
-
-SCAN STATE<br>
-Awaiting upload
-
 </div>
 
-</div>
-
-<div class="section">
+<div class="section" id="results">
 
 <div class="badge">AESTHETIC RESULTS</div>
 
-<h2>Premium scoring with a polished cinematic reveal.</h2>
+<h2>Premium scoring with cinematic reveal</h2>
 
-<p style="color:#aaa">Complete a luminous scan to reveal your simulated overall score.</p>
-
-<div class="result-card">
+<div class="card">
 
 Results will appear here
 
@@ -306,13 +307,11 @@ Results will appear here
 
 <div class="badge">IMPROVEMENT TIPS</div>
 
-<h2>Actionable refinement suggestions.</h2>
+<h2>Actionable refinement suggestions</h2>
 
-<p style="color:#aaa">Personalized tips will appear after your scan completes.</p>
+<div class="card">
 
-<div class="result-card">
-
-Tips appear here
+Tips will appear here
 
 </div>
 
@@ -334,52 +333,100 @@ Home · Scan · Results
 
 <script>
 
-/* background particles */
+/* smooth scroll */
 
-const canvas=document.getElementById("bg")
+const lenis = new Lenis()
+
+function raf(time){
+lenis.raf(time)
+requestAnimationFrame(raf)
+}
+
+requestAnimationFrame(raf)
+
+/* scroll */
+
+function scrollToSection(id){
+
+document.getElementById(id).scrollIntoView({
+behavior:"smooth"
+})
+
+}
+
+/* upload */
+
+const uploadBox=document.getElementById("uploadBox")
+const uploadInput=document.getElementById("imageUpload")
+const portrait=document.getElementById("portraitBox")
+
+uploadBox.onclick=()=>uploadInput.click()
+
+uploadInput.onchange=()=>{
+
+const file=uploadInput.files[0]
+
+if(!file)return
+
+const reader=new FileReader()
+
+reader.onload=e=>{
+
+portrait.innerHTML=
+`<img src="${e.target.result}" style="width:100%;border-radius:20px;">`
+
+}
+
+reader.readAsDataURL(file)
+
+}
+
+/* particles */
+
+const canvas=document.getElementById("particles")
 const ctx=canvas.getContext("2d")
 
 canvas.width=window.innerWidth
 canvas.height=window.innerHeight
 
-let particles=[]
+let p=[]
 
 for(let i=0;i<120;i++){
 
-particles.push({
+p.push({
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
 r:Math.random()*2,
-dx:(Math.random()-0.5)*0.4,
-dy:(Math.random()-0.5)*0.4
+dx:(Math.random()-.5)*.4,
+dy:(Math.random()-.5)*.4
 })
 
 }
 
-function animate(){
+function draw(){
 
 ctx.clearRect(0,0,canvas.width,canvas.height)
 
-particles.forEach(p=>{
+p.forEach(a=>{
 
 ctx.beginPath()
-ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
-ctx.fillStyle="rgba(255,255,255,.6)"
+ctx.arc(a.x,a.y,a.r,0,Math.PI*2)
+ctx.fillStyle="rgba(255,255,255,.7)"
 ctx.fill()
 
-p.x+=p.dx
-p.y+=p.dy
+a.x+=a.dx
+a.y+=a.dy
 
-if(p.x<0||p.x>canvas.width)p.dx*=-1
-if(p.y<0||p.y>canvas.height)p.dy*=-1
+if(a.x<0||a.x>canvas.width)a.dx*=-1
+if(a.y<0||a.y>canvas.height)a.dy*=-1
 
 })
 
-requestAnimationFrame(animate)
+requestAnimationFrame(draw)
 
 }
 
-animate()
+draw()
 
 </script>
 
