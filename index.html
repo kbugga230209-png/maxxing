@@ -7,35 +7,36 @@
 
 <title>Heavenly</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1/bundled/lenis.min.js"></script>
 
 <style>
 
-/* base */
-
 body{
 margin:0;
 font-family:Inter;
-background:#07080d;
+background:#04050a;
 color:white;
 overflow-x:hidden;
 }
 
-/* glow */
+/* GOLD HALO */
 
 body::before{
 content:"";
 position:fixed;
-width:100%;
-height:100%;
-background:
-radial-gradient(circle at 50% 10%,rgba(201,169,110,.25),transparent 60%);
-z-index:-3;
+width:800px;
+height:800px;
+top:-200px;
+left:50%;
+transform:translateX(-50%);
+background:radial-gradient(circle,rgba(201,169,110,.45),transparent 60%);
+filter:blur(140px);
+z-index:-5;
 }
 
-/* particles */
+/* PARTICLE CANVAS */
 
 #particles{
 position:fixed;
@@ -43,10 +44,10 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-z-index:-2;
+z-index:-4;
 }
 
-/* glass spheres */
+/* GLASS SPHERES */
 
 .glass{
 position:fixed;
@@ -54,243 +55,238 @@ border-radius:50%;
 
 background:
 radial-gradient(circle at 30% 30%,
-rgba(255,255,255,.35),
-rgba(255,255,255,.05) 40%,
+rgba(255,255,255,.55),
+rgba(255,255,255,.1) 40%,
 transparent 70%);
 
-backdrop-filter:blur(50px);
-
-border:1px solid rgba(255,255,255,.18);
+border:1px solid rgba(255,255,255,.3);
 
 box-shadow:
-inset 0 0 30px rgba(255,255,255,.15),
-0 0 80px rgba(201,169,110,.25);
+inset 0 0 40px rgba(255,255,255,.3),
+0 0 120px rgba(201,169,110,.35);
 
-opacity:.55;
+backdrop-filter:blur(60px);
 
-z-index:-1;
+animation:float 8s ease-in-out infinite;
 
-animation:float 12s infinite ease-in-out;
+z-index:-2;
 }
 
-.g1{width:160px;height:160px;top:20%;left:6%;}
-.g2{width:120px;height:120px;top:70%;left:85%;}
-.g3{width:200px;height:200px;top:85%;left:30%;}
+.g1{width:200px;height:200px;top:20%;left:5%;}
+.g2{width:160px;height:160px;top:70%;left:85%;}
+.g3{width:260px;height:260px;top:85%;left:30%;}
 
 @keyframes float{
 0%{transform:translateY(0)}
-50%{transform:translateY(-40px)}
+50%{transform:translateY(-50px)}
 100%{transform:translateY(0)}
 }
 
-/* navbar */
+/* NAVBAR */
 
 .nav{
 position:fixed;
 top:20px;
 left:50%;
 transform:translateX(-50%);
+
 display:flex;
 gap:40px;
-align-items:center;
 
-padding:14px 34px;
+padding:14px 36px;
 
 border-radius:40px;
 
-background:rgba(20,20,25,.45);
-backdrop-filter:blur(20px);
+background:rgba(20,20,30,.6);
 
-border:1px solid rgba(255,255,255,.08);
+backdrop-filter:blur(40px);
 
-box-shadow:0 0 30px rgba(201,169,110,.1);
+border:1px solid rgba(255,255,255,.15);
 
-z-index:10;
+box-shadow:0 0 40px rgba(201,169,110,.2);
+
+z-index:5;
 }
 
 .logo{
 font-family:Cinzel;
 letter-spacing:4px;
-font-size:18px;
 }
 
 .nav a{
-color:#bdbdbd;
+color:#ccc;
 text-decoration:none;
 cursor:pointer;
-transition:.3s;
 }
 
 .nav a:hover{
 color:#c9a96e;
 }
 
-/* hero */
+/* HERO */
 
 .hero{
-padding-top:160px;
+padding-top:180px;
 display:flex;
 justify-content:center;
 }
 
 .hero-card{
+
 width:80%;
-max-width:540px;
+max-width:520px;
 
-padding:60px;
+padding:70px;
 
-border-radius:34px;
+border-radius:40px;
 
-background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.1);
+background:rgba(255,255,255,.08);
 
-backdrop-filter:blur(40px);
+border:1px solid rgba(255,255,255,.15);
+
+backdrop-filter:blur(60px);
 
 text-align:center;
 
-box-shadow:0 0 100px rgba(201,169,110,.2);
+box-shadow:0 0 120px rgba(201,169,110,.3);
 
-position:relative;
+animation:float 6s infinite ease-in-out;
+
 }
-
-.hero-card::before{
-content:"";
-position:absolute;
-width:500px;
-height:500px;
-background:radial-gradient(circle,rgba(201,169,110,.3),transparent 70%);
-filter:blur(120px);
-z-index:-1;
-top:-100px;
-left:50%;
-transform:translateX(-50%);
-}
-
-/* badge */
 
 .badge{
-border:1px solid rgba(255,255,255,.1);
+border:1px solid rgba(255,255,255,.2);
 border-radius:30px;
 padding:8px 18px;
 display:inline-block;
 font-size:12px;
 letter-spacing:2px;
-color:#aaa;
-margin-bottom:18px;
+color:#bbb;
+margin-bottom:20px;
 }
-
-/* typography */
 
 h1{
 font-family:Cinzel;
 font-size:56px;
 letter-spacing:3px;
-margin:10px 0;
 }
 
 .subtitle{
 letter-spacing:3px;
 color:#d2b26f;
-font-size:14px;
 margin-bottom:10px;
 }
 
 .desc{
-color:#bdbdbd;
-line-height:1.6;
+color:#aaa;
 margin-bottom:30px;
 }
 
-/* buttons */
+/* BUTTONS */
 
 .btns{
 display:flex;
-gap:14px;
+gap:15px;
 justify-content:center;
 }
 
 .btn{
-padding:14px 30px;
+
+padding:16px 34px;
+
 border-radius:40px;
-font-weight:600;
-cursor:pointer;
-transition:.3s;
 
 background:rgba(255,255,255,.06);
-border:1px solid rgba(255,255,255,.1);
+
+border:1px solid rgba(255,255,255,.2);
 
 color:white;
 
-backdrop-filter:blur(20px);
+cursor:pointer;
+
+transition:.3s;
+}
+
+.btn:hover{
+transform:translateY(-3px);
+box-shadow:0 0 30px rgba(201,169,110,.5);
 }
 
 .btn.gold{
 background:linear-gradient(45deg,#f3e2b4,#caa75c);
-color:#111;
-box-shadow:0 0 20px rgba(201,169,110,.5);
+color:black;
 }
 
-/* sections */
+/* SECTIONS */
 
 .section{
 padding:120px 10%;
 text-align:center;
 }
 
-/* upload */
+/* UPLOAD */
 
 .upload{
 margin-top:40px;
 
-border:2px dashed rgba(255,255,255,.1);
+border:2px dashed rgba(255,255,255,.2);
+
 border-radius:30px;
 
-padding:50px;
+padding:60px;
 
-background:rgba(255,255,255,.04);
+background:rgba(255,255,255,.06);
 
 cursor:pointer;
+}
+
+.upload:hover{
+border-color:#c9a96e;
 }
 
 .upload input{
 display:none;
 }
 
-/* portrait */
+/* PORTRAIT */
 
 .portrait{
+
 margin-top:40px;
 
 border-radius:30px;
 
-padding:80px;
+padding:100px;
 
-background:rgba(255,255,255,.04);
+background:rgba(255,255,255,.06);
 
-border:1px solid rgba(255,255,255,.1);
+border:1px solid rgba(255,255,255,.15);
 }
 
-/* card */
+/* CARDS */
 
 .card{
+
 margin-top:40px;
 
 border-radius:30px;
 
-padding:40px;
+padding:50px;
 
-background:rgba(255,255,255,.04);
+background:rgba(255,255,255,.06);
 
-border:1px solid rgba(255,255,255,.1);
+border:1px solid rgba(255,255,255,.15);
 }
 
-/* footer */
+/* FOOTER */
 
 .footer{
-margin-top:100px;
-padding:40px;
 
-background:rgba(255,255,255,.05);
+margin-top:120px;
+
+padding:60px;
+
+background:rgba(255,255,255,.08);
 
 border-radius:30px;
 }
@@ -411,9 +407,9 @@ Home · Scan · Results
 
 <script>
 
-/* smooth scroll */
+/* SMOOTH SCROLL */
 
-const lenis = new Lenis()
+const lenis=new Lenis()
 
 function raf(time){
 lenis.raf(time)
@@ -422,17 +418,11 @@ requestAnimationFrame(raf)
 
 requestAnimationFrame(raf)
 
-/* scroll function */
-
 function scrollToSection(id){
-
-document.getElementById(id).scrollIntoView({
-behavior:"smooth"
-})
-
+document.getElementById(id).scrollIntoView({behavior:"smooth"})
 }
 
-/* upload */
+/* UPLOAD */
 
 const uploadBox=document.getElementById("uploadBox")
 const uploadInput=document.getElementById("imageUpload")
@@ -449,17 +439,14 @@ if(!file)return
 const reader=new FileReader()
 
 reader.onload=e=>{
-
-portrait.innerHTML=
-`<img src="${e.target.result}" style="width:100%;border-radius:20px;">`
-
+portrait.innerHTML=`<img src="${e.target.result}" style="width:100%;border-radius:20px;">`
 }
 
 reader.readAsDataURL(file)
 
 }
 
-/* particles */
+/* PARTICLES */
 
 const canvas=document.getElementById("particles")
 const ctx=canvas.getContext("2d")
@@ -469,7 +456,7 @@ canvas.height=window.innerHeight
 
 let p=[]
 
-for(let i=0;i<120;i++){
+for(let i=0;i<180;i++){
 
 p.push({
 x:Math.random()*canvas.width,
@@ -489,7 +476,7 @@ p.forEach(a=>{
 
 ctx.beginPath()
 ctx.arc(a.x,a.y,a.r,0,Math.PI*2)
-ctx.fillStyle="rgba(255,255,255,.35)"
+ctx.fillStyle="rgba(255,255,255,.6)"
 ctx.fill()
 
 a.x+=a.dx
