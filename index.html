@@ -5,14 +5,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Heavenly AI Analyzer</title>
+<title>Heavenly Analyzer</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1/bundled/lenis.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
 
 <style>
 
@@ -21,189 +19,20 @@ margin:0;
 font-family:Inter;
 background:#05060c;
 color:white;
-overflow-x:hidden;
-}
-
-/* halo */
-
-body::before{
-content:"";
-position:fixed;
-width:800px;
-height:800px;
-top:-200px;
-left:50%;
-transform:translateX(-50%);
-background:radial-gradient(circle,rgba(201,169,110,.45),transparent 60%);
-filter:blur(140px);
-z-index:-5;
-}
-
-/* particles */
-
-#particles{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:-4;
-}
-
-/* glass spheres */
-
-.glass{
-position:fixed;
-border-radius:50%;
-
-background:
-radial-gradient(circle at 30% 30%,
-rgba(255,255,255,.6),
-rgba(255,255,255,.1) 40%,
-transparent 70%);
-
-border:1px solid rgba(255,255,255,.3);
-
-box-shadow:
-inset 0 0 40px rgba(255,255,255,.4),
-0 0 120px rgba(201,169,110,.35);
-
-backdrop-filter:blur(70px);
-
-animation:float 8s ease-in-out infinite;
-
-z-index:-2;
-}
-
-.g1{width:220px;height:220px;top:20%;left:5%;}
-.g2{width:160px;height:160px;top:70%;left:85%;}
-.g3{width:260px;height:260px;top:85%;left:30%;}
-
-@keyframes float{
-0%{transform:translateY(0)}
-50%{transform:translateY(-50px)}
-100%{transform:translateY(0)}
-}
-
-/* navbar */
-
-.nav{
-position:fixed;
-top:20px;
-left:50%;
-transform:translateX(-50%);
-display:flex;
-gap:40px;
-padding:14px 36px;
-border-radius:40px;
-background:rgba(20,20,30,.6);
-backdrop-filter:blur(40px);
-border:1px solid rgba(255,255,255,.15);
-z-index:5;
-}
-
-.logo{
-font-family:Cinzel;
-letter-spacing:4px;
-}
-
-.nav a{
-color:#ccc;
-text-decoration:none;
-cursor:pointer;
-}
-
-/* hero */
-
-.hero{
-padding-top:180px;
-display:flex;
-justify-content:center;
-}
-
-.hero-card{
-width:80%;
-max-width:520px;
-padding:70px;
-border-radius:40px;
-background:rgba(255,255,255,.08);
-border:1px solid rgba(255,255,255,.15);
-backdrop-filter:blur(60px);
 text-align:center;
-box-shadow:0 0 120px rgba(201,169,110,.3);
-}
-
-.badge{
-border:1px solid rgba(255,255,255,.2);
-border-radius:30px;
-padding:8px 18px;
-display:inline-block;
-font-size:12px;
-letter-spacing:2px;
-color:#bbb;
-margin-bottom:20px;
 }
 
 h1{
 font-family:Cinzel;
-font-size:54px;
 letter-spacing:3px;
 }
-
-.subtitle{
-letter-spacing:3px;
-color:#d2b26f;
-margin-bottom:10px;
-}
-
-.desc{
-color:#aaa;
-margin-bottom:30px;
-}
-
-/* buttons */
-
-.btns{
-display:flex;
-gap:15px;
-justify-content:center;
-}
-
-.btn{
-padding:16px 34px;
-border-radius:40px;
-background:rgba(255,255,255,.06);
-border:1px solid rgba(255,255,255,.2);
-color:white;
-cursor:pointer;
-transition:.3s;
-}
-
-.btn:hover{
-transform:translateY(-3px);
-box-shadow:0 0 30px rgba(201,169,110,.5);
-}
-
-.btn.gold{
-background:linear-gradient(45deg,#f3e2b4,#caa75c);
-color:black;
-}
-
-/* sections */
-
-.section{
-padding:120px 10%;
-text-align:center;
-}
-
-/* upload */
 
 .upload{
-margin-top:40px;
-border:2px dashed rgba(255,255,255,.2);
-border-radius:30px;
-padding:60px;
-background:rgba(255,255,255,.06);
+margin:40px auto;
+width:260px;
+padding:30px;
+border:2px dashed #aaa;
+border-radius:20px;
 cursor:pointer;
 }
 
@@ -211,29 +40,18 @@ cursor:pointer;
 display:none;
 }
 
-/* portrait */
-
-.portrait{
-margin-top:40px;
-border-radius:30px;
-padding:20px;
-background:rgba(255,255,255,.06);
-border:1px solid rgba(255,255,255,.15);
-}
-
 canvas{
-max-width:100%;
+max-width:90%;
 border-radius:20px;
+margin-top:20px;
 }
-
-/* cards */
 
 .card{
-margin-top:40px;
-border-radius:30px;
-padding:50px;
-background:rgba(255,255,255,.06);
-border:1px solid rgba(255,255,255,.15);
+margin:40px auto;
+padding:30px;
+width:300px;
+background:rgba(255,255,255,.05);
+border-radius:20px;
 }
 
 </style>
@@ -242,131 +60,42 @@ border:1px solid rgba(255,255,255,.15);
 
 <body>
 
-<canvas id="particles"></canvas>
-
-<div class="glass g1"></div>
-<div class="glass g2"></div>
-<div class="glass g3"></div>
-
-<div class="nav">
-
-<div class="logo">HEAVENLY</div>
-
-<a onclick="scrollToSection('hero')">Home</a>
-<a onclick="scrollToSection('scan')">Scan</a>
-<a onclick="scrollToSection('results')">Results</a>
-
-</div>
-
-<div class="hero" id="hero">
-
-<div class="hero-card">
-
-<div class="badge">DIVINE INTELLIGENCE · FUTURISTIC AESTHETICS</div>
-
 <h1>HEAVENLY</h1>
 
-<div class="subtitle">AI AESTHETIC ANALYZER</div>
-
-<div class="desc">Discover your aesthetic potential.</div>
-
-<div class="btns">
-
-<button class="btn gold" onclick="scrollToSection('scan')">
-Scan My Face
-</button>
-
-<button class="btn" onclick="scrollToSection('results')">
-Learn More
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="section" id="scan">
-
-<div class="badge">SIMULATED NEURAL SCAN</div>
-
-<h2>Upload a portrait for cinematic analysis</h2>
-
 <div class="upload" id="uploadBox">
-
 <input type="file" id="imageUpload" accept="image/*">
-
-☁️ Upload Image
-
+Upload Image
 </div>
 
-<div class="portrait">
+<canvas id="canvas"></canvas>
 
-<canvas id="mesh"></canvas>
-
+<div class="card" id="results">
+Upload a face to analyze
 </div>
 
-</div>
-
-<div class="section" id="results">
-
-<div class="badge">AESTHETIC RESULTS</div>
-
-<h2>Premium scoring with cinematic reveal</h2>
-
-<div class="card" id="resultCard">
-Upload an image to generate analysis
-</div>
-
-</div>
-
-<div class="section">
-
-<div class="badge">IMPROVEMENT TIPS</div>
-
-<h2>Actionable refinement suggestions</h2>
-
-<div class="card" id="tipsCard">
-Tips will appear after analysis
-</div>
-
+<div class="card" id="tips">
+Tips will appear here
 </div>
 
 <script>
 
-/* smooth scroll */
-
-const lenis=new Lenis()
-
-function raf(time){
-lenis.raf(time)
-requestAnimationFrame(raf)
-}
-
-requestAnimationFrame(raf)
-
-function scrollToSection(id){
-document.getElementById(id).scrollIntoView({behavior:"smooth"})
-}
-
-/* upload + AI */
-
 const uploadBox=document.getElementById("uploadBox")
 const uploadInput=document.getElementById("imageUpload")
 
-const canvas=document.getElementById("mesh")
+const canvas=document.getElementById("canvas")
 const ctx=canvas.getContext("2d")
 
 uploadBox.onclick=()=>uploadInput.click()
 
 const faceMesh=new FaceMesh({
-locateFile:file=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+locateFile:(file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
 })
 
 faceMesh.setOptions({
 maxNumFaces:1,
 refineLandmarks:true,
-minDetectionConfidence:.5
+minDetectionConfidence:0.5,
+minTrackingConfidence:0.5
 })
 
 faceMesh.onResults(results=>{
@@ -377,10 +106,18 @@ if(results.multiFaceLandmarks){
 
 const landmarks=results.multiFaceLandmarks[0]
 
-drawConnectors(ctx,landmarks,FACEMESH_TESSELATION,
-{color:"#c9a96e",lineWidth:1})
+drawConnectors(
+ctx,
+landmarks,
+FACEMESH_TESSELATION,
+{color:"#c9a96e",lineWidth:1}
+)
 
 generateResults()
+
+}else{
+
+document.getElementById("results").innerText="No face detected"
 
 }
 
@@ -414,81 +151,23 @@ function generateResults(){
 const symmetry=(Math.random()*2+7).toFixed(1)
 const jaw=(Math.random()*2+6).toFixed(1)
 const eyes=(Math.random()*2+6).toFixed(1)
-const skin=(Math.random()*2+6).toFixed(1)
 
-const overall=((+symmetry + +jaw + +eyes + +skin)/4).toFixed(1)
+const overall=((+symmetry+ +jaw+ +eyes)/3).toFixed(1)
 
-document.getElementById("resultCard").innerHTML=`
-
-<h3>Overall Score: ${overall}/10</h3>
-
-<p>Symmetry: ${symmetry}</p>
-<p>Jawline: ${jaw}</p>
-<p>Eyes: ${eyes}</p>
-<p>Skin: ${skin}</p>
-
+document.getElementById("results").innerHTML=`
+<b>Overall Score: ${overall}/10</b><br>
+Symmetry: ${symmetry}<br>
+Jawline: ${jaw}<br>
+Eyes: ${eyes}
 `
 
-document.getElementById("tipsCard").innerHTML=`
-
-<ul style="text-align:left">
-
-<li>Maintain balanced grooming</li>
-<li>Improve lighting when taking photos</li>
-<li>Keep skin hydrated</li>
-
-</ul>
-
+document.getElementById("tips").innerHTML=`
+• Maintain good skin hydration<br>
+• Try hairstyles framing your face<br>
+• Improve lighting when taking photos
 `
 
 }
-
-/* particles */
-
-const canvasBG=document.getElementById("particles")
-const ctxBG=canvasBG.getContext("2d")
-
-canvasBG.width=window.innerWidth
-canvasBG.height=window.innerHeight
-
-let p=[]
-
-for(let i=0;i<160;i++){
-
-p.push({
-x:Math.random()*canvasBG.width,
-y:Math.random()*canvasBG.height,
-r:Math.random()*2,
-dx:(Math.random()-.5)*.3,
-dy:(Math.random()-.5)*.3
-})
-
-}
-
-function draw(){
-
-ctxBG.clearRect(0,0,canvasBG.width,canvasBG.height)
-
-p.forEach(a=>{
-
-ctxBG.beginPath()
-ctxBG.arc(a.x,a.y,a.r,0,Math.PI*2)
-ctxBG.fillStyle="rgba(255,255,255,.6)"
-ctxBG.fill()
-
-a.x+=a.dx
-a.y+=a.dy
-
-if(a.x<0||a.x>canvasBG.width)a.dx*=-1
-if(a.y<0||a.y>canvasBG.height)a.dy*=-1
-
-})
-
-requestAnimationFrame(draw)
-
-}
-
-draw()
 
 </script>
 
